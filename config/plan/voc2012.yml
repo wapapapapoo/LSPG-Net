@@ -1,0 +1,87 @@
+image_height: 384
+image_width: 512
+image_channel: 3 # lab
+cell_size: 16 # sfcn cell size
+n_classes: 21 # for voc2012 21, for city: 19
+
+hard_gnn_output: true
+use_decoder: true
+
+sfcn:
+  use_pretrain_weight: true
+  freeze_weight: true
+
+encoder:
+  out_dim: 256
+
+gnn:
+  in_dim: 258
+  out_dim: 256
+  in_feat_dropout: 0.2
+  dropout: 0.3
+  aggregator_type: "mean"
+  batch_norm: "gn"
+  residual: true
+  dgl_builtin: true
+  tag_kernel: 4
+  conv_type: "tag"
+  readout: 0.3
+  random_drop_edges: 0.
+
+decoder:
+  fp_channels: 256
+  fsp_channels: 256
+  hidden_channels: 256
+  use_se: true
+  se_reduction: 16
+  use_gn: true
+  dropout: 0.1
+
+loss:
+  lambda_main: 1.
+  lambda_spix: 0.6
+  lambda_sfcn: 0.
+  pix_loss_type: "focal"
+  # weight:
+  #   [
+  #     1.,
+  #     1.,
+  #     1.,
+  #     1.,
+  #     1.,
+  #     1.,
+  #     1.,
+  #     1.,
+  #     1.,
+  #     1.,
+  #     1.,
+  #     1.,
+  #     1.,
+  #     5.,
+  #     1.,
+  #     20.,
+  #     20.,
+  #     1.,
+  #     1.,
+  #   ]
+
+train:
+  lr: 0.0001
+  weight_decay: 0.0001
+  lr_schedule:
+    # type: none
+    type: cosine
+    t_max: 100
+    eta_min: 0.00005
+    last_epoch: -1
+    warmup_steps: 1000
+    # type: step
+    gamma: 0.5
+    milsestone: [100, 200, 300, 400, 500]
+
+  batch_size: 4
+  limit_train_batches: 1.
+  limit_val_batches: 1.
+  num_workers: 16
+  max_epochs: 100
+  pre_train_epoch: 10
