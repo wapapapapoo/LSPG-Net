@@ -1,0 +1,7 @@
+**/__pycache__
+*.pyc
+/data
+/lightning_logs
+!.gitignore
+/pred.png
+/pred_spix.png

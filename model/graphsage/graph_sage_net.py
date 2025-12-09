@@ -135,53 +135,6 @@ class GraphSageLayer(nn.Module):
                                               self.in_channels,
                                               self.out_channels, self.aggregator_type, self.residual)
 
-    
-# class GraphSageNet(nn.Module):
-#     """
-#     Grahpsage network with multiple GraphSageLayer layers
-#     """
-#     def __init__(self,
-#                  in_dim: int=5,
-#                  hidden_dims: int=[256, 256, 256, 256, 256],
-#                  out_dim: int=256,
-#                  n_classes: int=21,
-#                  in_feat_dropout: float=0.5,
-#                  dropout: float=0.5,
-#                  aggregator_type: str='mean',
-#                  batch_norm: str='gn',
-#                  residual: bool=False,
-#                  dgl_builtin: bool=True,
-#                  tag_kernel: int=8,
-#                  conv_type: str='tag',
-#                  readout: float=0.5,
-#                  device: torch.device=torch.device('cuda')
-#                  ):
-#         super().__init__()
-#         self.n_classes = n_classes
-#         self.conv_type = conv_type
-#         self.readout = readout
-#         self.device = device
-#         self.embedding_h = nn.Linear(in_dim, hidden_dims[0])
-#         self.in_feat_dropout = nn.Dropout(in_feat_dropout)
-
-#         self.layers = nn.ModuleList([GraphSageLayer(hidden_dims[i], hidden_dims[i + 1], F.relu,
-#                                               dropout, aggregator_type, batch_norm, residual, device = self.device, dgl_builtin =  dgl_builtin, conv_type = self.conv_type, tag_kernel = tag_kernel) for i in range(len(hidden_dims) - 1)])
-#         self.layers.append(GraphSageLayer(hidden_dims[len(hidden_dims) - 1], out_dim, F.relu, dropout, aggregator_type, batch_norm, residual,device = self.device,  dgl_builtin =  dgl_builtin, conv_type = self.conv_type, tag_kernel = tag_kernel))
-#         self.MLP_layer = MLPReadout(out_dim, self.n_classes) # readout layer. hidden_dim=out_dim=108.
-        
-#     def forward(self, g, h):
-#         # print("Work!")
-#         if self.conv_type == 'gat':
-#             g = dgl.add_self_loop(g)
-#         h = self.embedding_h(h)
-#         h = self.in_feat_dropout(h)
-#         for conv in self.layers:
-#             h = conv(g, h) # [n_nodes, out_dim]
-
-#         h_out = self.MLP_layer(h)
-        
-#         return h_out # [n_nodes,n_classes]
-
 class GraphSageNet(nn.Module):
     """
     Grahpsage network with multiple GraphSageLayer layers
@@ -224,10 +177,46 @@ class GraphSageNet(nn.Module):
                 256, 256, F.relu, dropout, aggregator_type, batch_norm, residual,
                 device = self.device, dgl_builtin = dgl_builtin, conv_type = 'tag',
                 tag_kernel = tag_kernel),
+            GraphSageLayer(
+                256, 256, F.relu, dropout, aggregator_type, batch_norm, residual,
+                device = self.device, dgl_builtin = dgl_builtin, conv_type = 'tag',
+                tag_kernel = tag_kernel),
+            GraphSageLayer(
+                256, 256, F.relu, dropout, aggregator_type, batch_norm, residual,
+                device = self.device, dgl_builtin = dgl_builtin, conv_type = 'tag',
+                tag_kernel = tag_kernel),
+            GraphSageLayer(
+                256, 256, F.relu, dropout, aggregator_type, batch_norm, residual,
+                device = self.device, dgl_builtin = dgl_builtin, conv_type = 'tag',
+                tag_kernel = tag_kernel),
+            GraphSageLayer(
+                256, 256, F.relu, dropout, aggregator_type, batch_norm, residual,
+                device = self.device, dgl_builtin = dgl_builtin, conv_type = 'tag',
+                tag_kernel = tag_kernel),
+            GraphSageLayer(
+                256, 256, F.relu, dropout, aggregator_type, batch_norm, residual,
+                device = self.device, dgl_builtin = dgl_builtin, conv_type = 'tag',
+                tag_kernel = tag_kernel),
+            GraphSageLayer(
+                256, 256, F.relu, dropout, aggregator_type, batch_norm, residual,
+                device = self.device, dgl_builtin = dgl_builtin, conv_type = 'tag',
+                tag_kernel = tag_kernel),
+            GraphSageLayer(
+                256, 256, F.relu, dropout, aggregator_type, batch_norm, residual,
+                device = self.device, dgl_builtin = dgl_builtin, conv_type = 'tag',
+                tag_kernel = tag_kernel),
+            GraphSageLayer(
+                256, 256, F.relu, dropout, aggregator_type, batch_norm, residual,
+                device = self.device, dgl_builtin = dgl_builtin, conv_type = 'tag',
+                tag_kernel = tag_kernel),
+            GraphSageLayer(
+                256, 256, F.relu, dropout, aggregator_type, batch_norm, residual,
+                device = self.device, dgl_builtin = dgl_builtin, conv_type = 'tag',
+                tag_kernel = tag_kernel),
         ]
         self.layers = nn.ModuleList(layer_list)
-        self.layers.append(GraphSageLayer(256, out_dim, F.relu, dropout, aggregator_type, batch_norm, residual,device = self.device,  dgl_builtin =  dgl_builtin, conv_type = self.conv_type, tag_kernel = tag_kernel))
-        # self.MLP_layer = MLPReadout(out_dim, self.n_classes) # readout layer. hidden_dim=out_dim=108.
+        self.layers.append(GraphSageLayer(256 * 3, out_dim, F.relu, dropout, aggregator_type, batch_norm, residual,device = self.device,  dgl_builtin =  dgl_builtin, conv_type = self.conv_type, tag_kernel = tag_kernel))
+        self.MLP_layer = MLPReadout(out_dim, self.out_dim) # readout layer. hidden_dim=out_dim=108.
         
     def forward(self, g, h):
         g = dgl.add_self_loop(g)
@@ -238,9 +227,24 @@ class GraphSageNet(nn.Module):
         h = self.layers[1](g, h)
         h = self.layers[2](g, h)
         h = self.layers[3](g, h)
+        h1 = h
 
-        # h_out = self.MLP_layer(h)
-        h_out = h
+        h = self.layers[4](g, h)
+        h = self.layers[5](g, h)
+        h = self.layers[6](g, h)
+        h = self.layers[7](g, h)
+        h2 = h
+
+        h = self.layers[8](g, h)
+        h = self.layers[9](g, h)
+        h = self.layers[10](g, h)
+        h = self.layers[11](g, h)
+        h3 = h
+
+        h = torch.concat((h1, h2, h3), 1)
+        h = self.layers[12](g, h)
+
+        h_out = self.MLP_layer(h)
 
         return h_out # [n_nodes, output_dim]
 
